@@ -188,7 +188,7 @@ jobs:
               curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
               ;;
             "SUKI")
-              echo "Adding SukiSU-Ultra..."
+              echo "Adding SukiSU Ultra..."
               curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
               ;;
           esac
@@ -212,8 +212,6 @@ jobs:
               BASE_VERSION=10200
               ;;
             "SUKI")
-              cd ./SukiSU-Ultra
-              BASE_VERSION=10200
               ;;
             "MKSU")
               ;;

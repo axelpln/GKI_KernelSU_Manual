@@ -40,7 +40,7 @@ on:
         description: 'Include SUKI?'
         required: true
         type: boolean
-        default: true
+        default: false
       kernelsu_branch:
         description: "Choose ksu branch"
         required: true
@@ -175,8 +175,8 @@ jobs:
           get_ref "WILD" "https://github.com/WildKernels/Wild_KSU.git" "WildKernels/Wild_KSU" "$MODE"
           get_ref "KSU" "https://github.com/tiann/KernelSU.git" "tiann/KernelSU" "$MODE"
           get_ref "NEXT" "https://github.com/KernelSU-Next/KernelSU-Next.git" "KernelSU-Next/KernelSU-Next" "$MODE"
-          get_ref "MKSU" "https://github.com/5ec1cff/KernelSU.git" "5ec1cff/KernelSU" "commit"
           get_ref "SUKI" "https://github.com/SukiSU-Ultra/SukiSU-Ultra.git" "SukiSU-Ultra/SukiSU-Ultra" "$MODE"
+          get_ref "MKSU" "https://github.com/5ec1cff/KernelSU.git" "5ec1cff/KernelSU" "commit"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -218,7 +218,7 @@ jobs:
           -> KernelSU: [${{ env.KSU_REF }}](${{ env.KSU_URL }})
           -> 5ec1cff: [${{ env.MKSU_REF }}](${{ env.MKSU_URL }})
           -> KernelSU Next: [${{ env.NEXT_REF }}](${{ env.NEXT_URL }})
-          -> SukiSU-Ultra: [${{ env.SUKI_REF }}](${{ env.SUKI_URL }})
+          -> SukiSU Ultra: [${{ env.SUKI_REF }}](${{ env.SUKI_URL }})
           EOF
 
       - name: Create GitHub Release
