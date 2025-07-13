@@ -44,7 +44,6 @@ To get boot.img format:
 # Features
 
 - **KernelSU**: KernelSU is a root solution for Android GKI devices, it works in kernel mode and grants root permission to userspace applications directly in kernel space.
-- **SUSFS**: An addon root hiding kernel patches and userspace module for KernelSU.
 
 ---
 
@@ -53,8 +52,6 @@ To get boot.img format:
 - **KernelSU**: Developed by [tiann](https://github.com/tiann/KernelSU).
 - **KernelSU-Next**: Developed by [rifsxd](https://github.com/KernelSU-Next/KernelSU-Next).
 - **Magic-KSU**: Developed by [5ec1cff](https://github.com/5ec1cff/KernelSU).  
-- **SUSFS**: Developed by [simonpunk](https://gitlab.com/simonpunk/susfs4ksu.git).
-- **SUSFS Module**: Developed by [sidex15](https://github.com/sidex15).
 - **Sultan Kernels**: Developed by [kerneltoast](https://github.com/kerneltoast).
 
 Special thanks to the open-source community for their contributions!
