@@ -151,6 +151,8 @@ jobs:
                 echo "BRANCH=-s next" >> $GITHUB_ENV
               elif [[ "${{ inputs.kernelsu_variant }}" == "WILD" ]]; then
                 echo "BRANCH=-s wild" >> $GITHUB_ENV
+              elif [[ "${{ inputs.kernelsu_variant }}" == "SUKI" ]]; then
+                echo "BRANCH=-s suki" >> $GITHUB_ENV
               fi
               ;;
             "Other")
@@ -185,6 +187,10 @@ jobs:
               echo "Adding KernelSU MKSU..."
               curl -LSs "https://raw.githubusercontent.com/5ec1cff/KernelSU/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
               ;;
+            "SUKI")
+              echo "Adding SukiSU-Ultra..."
+              curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
+              ;;
           esac
           
       - name: Getting KernelSU Version
@@ -203,6 +209,10 @@ jobs:
               ;;
             "NEXT")
               cd ./KernelSU-Next
+              BASE_VERSION=10200
+              ;;
+            "SUKI")
+              cd ./SukiSU-Ultra
               BASE_VERSION=10200
               ;;
             "MKSU")
@@ -226,6 +236,10 @@ jobs:
             echo "Applying hooks for Wild KSU..."
             cp ../../kernel_patches/wild/syscall_hooks.patch ./
             patch -p1 -F 3 < syscall_hooks.patch
+          elif [ "${{ inputs.kernelsu_variant }}" == "SUKI" ]; then
+            echo "Applying hooks for SukiSU-Ultra..."
+            cp ../../kernel_patches/sukisu/syscall_hooks.patch ./
+            patch -p1 -F 3 < syscall_hooks.patch
           fi
 
       - name: Apply Hide Stuff Patches
@@ -244,7 +258,7 @@ jobs:
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
           
-          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WILD" ]; then
+          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WILD" ] || [ "${{ inputs.kernelsu_variant }}" == "SUKI" ]; then
             echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./common/arch/arm64/configs/gki_defconfig
             echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./common/arch/arm64/configs/gki_defconfig
           fi

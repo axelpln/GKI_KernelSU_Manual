@@ -15,7 +15,7 @@ on:
           - Actions
           - Pre-Release
           - Release
-        default: Pre-Release
+        default: Actions
       include_wild:
         description: 'Include WILD?'
         required: true
@@ -36,6 +36,11 @@ on:
         required: true
         type: boolean
         default: false
+      include_suki:
+        description: 'Include SUKI?'
+        required: true
+        type: boolean
+        default: true
       kernelsu_branch:
         description: "Choose ksu branch"
         required: true
@@ -81,6 +86,7 @@ jobs:
           [[ "${{ inputs.include_ksu }}" == "true" ]] && VARIANTS+=("\"KSU\"")
           [[ "${{ inputs.include_next }}" == "true" ]] && VARIANTS+=("\"NEXT\"")
           [[ "${{ inputs.include_mksu }}" == "true" ]] && VARIANTS+=("\"MKSU\"")
+          [[ "${{ inputs.include_suki }}" == "true" ]] && VARIANTS+=("\"SUKI\"")
           echo "matrix={\"kernelsu_variant\": [$(IFS=,; echo "${VARIANTS[*]}")]}" >> $GITHUB_OUTPUT
 
   build-kernels-a12:
@@ -141,39 +147,11 @@ jobs:
       - build-kernels-a15
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      RELEASE_NAME: "GKI Kernels With WildKSU & SUSFS v1.5.9"
+      RELEASE_NAME: "GKI Kernels With WildKSU"
       RELEASE_BODY:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get commit hashes and generate commit URLs
-        run: |
-          GITLAB_OWNER="simonpunk"
-          GITLAB_REPO="susfs4ksu"
-          
-          declare -A BRANCH_MAP=(
-            ["gki_android12_5_10"]="gki-android12-5.10"
-            ["gki_android13_5_10"]="gki-android13-5.10"
-            ["gki_android13_5_15"]="gki-android13-5.15"
-            ["gki_android14_5_15"]="gki-android14-5.15"
-            ["gki_android14_6_1"]="gki-android14-6.1"
-            ["gki_android15_6_6"]="gki-android15-6.6"
-          )
-          
-          for var_name in "${!BRANCH_MAP[@]}"; do
-            branch_name="${BRANCH_MAP[$var_name]}"
-            COMMIT_HASH=$(git ls-remote https://gitlab.com/$GITLAB_OWNER/$GITLAB_REPO.git refs/heads/$branch_name | awk '{ print $1 }')
-            
-            if [[ -n "$COMMIT_HASH" ]]; then
-              COMMIT_URL="https://gitlab.com/$GITLAB_OWNER/$GITLAB_REPO/-/commit/$COMMIT_HASH"
-              echo "$branch_name Commit: $COMMIT_HASH"
-              echo "$branch_name Commit URL: $COMMIT_URL"
-              
-              echo "COMMIT_HASH_${var_name}=$COMMIT_HASH" >> "$GITHUB_ENV"
-              echo "COMMIT_URL_${var_name}=$COMMIT_URL" >> "$GITHUB_ENV"
-            fi
-          done
 
       - name: Get KernelSU variant refs and links
         run: |
@@ -198,21 +176,7 @@ jobs:
           get_ref "KSU" "https://github.com/tiann/KernelSU.git" "tiann/KernelSU" "$MODE"
           get_ref "NEXT" "https://github.com/KernelSU-Next/KernelSU-Next.git" "KernelSU-Next/KernelSU-Next" "$MODE"
           get_ref "MKSU" "https://github.com/5ec1cff/KernelSU.git" "5ec1cff/KernelSU" "commit"
-
-      - name: Generate and Create New Tag
-        run: |
-            LATEST_TAG=$(gh api repos/${{ github.repository }}/tags --jq '.[0].name')
-            if [ -z "$LATEST_TAG" ]; then
-              LATEST_TAG="v1.5.9-r0"
-            fi
-            
-            NEW_TAG=$(echo "$LATEST_TAG" | awk -F'-r' '{suffix=$2; if (!suffix) suffix=0; suffix++; printf "%s-r%d", $1, suffix}')
-    
-            echo "New tag: $NEW_TAG"
-            echo "NEW_TAG=${NEW_TAG}" >> $GITHUB_ENV
-
-            git tag $NEW_TAG
-            git push origin $NEW_TAG
+          get_ref "SUKI" "https://github.com/SukiSU-Ultra/SukiSU-Ultra.git" "SukiSU-Ultra/SukiSU-Ultra" "$MODE"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
@@ -229,7 +193,6 @@ jobs:
           Features:
           -> Wild KSU Kernels & Others
           -> Multi Manager Support for Wild Kernels & Next Kernels (Not Recommended)
-          -> SUSFS ඞ v1.5.9
           -> Scope-Minimized Manual hooks v1.4
           -> Magic Mount Support
           -> Simple Maphide for LineageOS Detections
@@ -239,10 +202,7 @@ jobs:
       
           Notes:
           -> Wild KSU & KernelSU-Next, SUS SU Mode 2 will show as disabled or not compatble due to non-kprobe hooks and is not needed anymore!
-          -> Official Kernel Flasher is broken with latest susfs, try https://github.com/fatalcoder524/KernelFlasher/ or https://github.com/libxzr/HorizonKernelFlasher!
-      
-          Module: 
-          -> https://github.com/sidex15/ksu_module_susfs
+          -> Official Kernel Flasher may broken, try https://github.com/fatalcoder524/KernelFlasher/ or https://github.com/libxzr/HorizonKernelFlasher !
       
           Managers:
           -> Wild KSU: https://github.com/WildKernels/Wild_KSU / https://t.me/WildKernels
@@ -251,19 +211,14 @@ jobs:
           -> KernelSU-Next: https://github.com/rifsxd/KernelSU-Next / https://t.me/ksunext_group
           -> rsuntk: https://github.com/rsuntk/KernelSU / https://t.me/rsukrnlsu
           -> backslashxx: https://github.com/backslashxx/KernelSU
+          -> SukiSU-Ultra: https://github.com/SukiSU-Ultra/SukiSU-Ultra / https://t.me/Sukiksu
       
           Commit Hashes (at the time of release):
           -> Wild KSU: [${{ env.WILD_REF }}](${{ env.WILD_URL }})
           -> KernelSU: [${{ env.KSU_REF }}](${{ env.KSU_URL }})
           -> 5ec1cff: [${{ env.MKSU_REF }}](${{ env.MKSU_URL }})
           -> KernelSU Next: [${{ env.NEXT_REF }}](${{ env.NEXT_URL }})
-          -> SUSFS4KSU: 
-            -> gki-android12-5.10: [${{ env.COMMIT_HASH_gki_android12_5_10 }}](${{ env.COMMIT_URL_gki_android12_5_10 }})
-            -> gki-android13-5.10: [${{ env.COMMIT_HASH_gki_android13_5_10 }}](${{ env.COMMIT_URL_gki_android13_5_10 }})
-            -> gki-android13-5.15: [${{ env.COMMIT_HASH_gki_android13_5_15 }}](${{ env.COMMIT_URL_gki_android13_5_15 }})
-            -> gki-android14-5.15: [${{ env.COMMIT_HASH_gki_android14_5_15 }}](${{ env.COMMIT_URL_gki_android14_5_15 }})
-            -> gki-android14-6.1: [${{ env.COMMIT_HASH_gki_android14_6_1 }}](${{ env.COMMIT_URL_gki_android14_6_1 }})
-            -> gki-android15-6.6: [${{ env.COMMIT_HASH_gki_android15_6_6 }}](${{ env.COMMIT_URL_gki_android15_6_6 }})
+          -> SukiSU-Ultra: [${{ env.SUKI_REF }}](${{ env.SUKI_URL }})
           EOF
 
       - name: Create GitHub Release
