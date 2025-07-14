@@ -238,6 +238,10 @@ jobs:
             echo "Applying hooks for Wild KSU..."
             cp ../../kernel_patches/wild/syscall_hooks.patch ./
             patch -p1 -F 3 < syscall_hooks.patch
+          elif [ "${{ inputs.kernelsu_variant }}" == "SUKI" ]; then
+            echo "Applying hooks for SukiSU Ultra..."
+            cp ../../kernel_patches/next/scope_min_manual_hooks_v1.4.patch ./
+            patch -p1 -F 3 < scope_min_manual_hooks_v1.4.patch
           fi
 
       - name: Apply Hide Stuff Patches
